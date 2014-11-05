@@ -1,0 +1,28 @@
+<%
+  socket = [
+    ENV["BOXEN_MYSQL_SOCKET"],
+    "/var/run/mysql5/mysqld.sock",
+    "/tmp/mysql.sock"
+  ].detect { |f| f && File.exist?(f) }
+
+  port = ENV.fetch("BOXEN_MYSQL_PORT", "3306")
+%>
+
+default: &default
+  adapter: mysql2
+  username: root
+<% if socket %>
+  host: localhost
+  socket: <%= socket %>
+<% else %>
+  host: 127.0.0.1
+  port: <%= port %>
+<% end %>
+
+development:
+  <<: *default
+  database: active_shipping_test_development
+
+test:
+  <<: *default
+  database: active_shipping_test_test
